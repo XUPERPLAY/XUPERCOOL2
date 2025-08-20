@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>XUPERCOOL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    html,body{margin:0;height:100%;background:#000;color:#fff;font-family:Arial}
+    .header{background:#111;padding:6px 12px;text-align:center;font-size:16px}
+    .container{display:flex;height:calc(100% - 40px)}
+    /* Visor centrado y responsive */
+    .visor{flex:2;display:flex;justify-content:center;align-items:center;background:#000;position:relative}
+    #player{width:100%;max-width:960px;height:100%;max-height:540px;border:0}
+    /* Panel de canales más ancho */
+    .channels-container{flex:2;min-width:240px;padding:10px;background:#222;overflow-y:auto}
+    .btn{display:block;margin:4px 0;padding:8px 12px;background:#007BFF;color:#fff;border:none;border-radius:4px;width:100%;cursor:pointer;font-size:15px;transition:background 0.3s}
+    .btn:hover{background:#0056b3}
+    .btn.active{background:#FF0000} /* Estilo para el botón activo */
+    .search-bar{padding: 8px; width: calc(100% - 16px); box-sizing: border-box; font-size: 16px; border-radius: 4px; border: 1px solid #555; background: #333; color: #fff;}
+    @media(max-width:768px){.container{flex-direction:column}#player{max-height:40vh}}
+    .fullscreen-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+    }
+    #search-container {
+      position: sticky;
+      top: 0;
+      background: #222;
+      padding: 10px 0;
+      z-index: 10;
+    }
+    #now-playing {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">By * ᘜᖇOᑌᑭ ᙭ᑌᑭᗴᖇMLIՏT © *</div>
+  <div class="logo-container" style="text-align: center; padding: 10px 0;">
+    <img src="https://i.postimg.cc/sDYmVHJD/logo8-19-192246.png" alt="XUPERCOOL" style="max-width: 135px; height: auto;">
+  </div>
+
+  <div class="container">
+    <div class="visor">
+      <iframe id="player" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <button class="fullscreen-btn" onclick="goFullscreen()">Pantalla Completa</button>
+    </div>
+    <div id="channelsList" class="channels-container">
+      <div id="search-container">
+        <span id="now-playing">Estas viendo: Cargando...</span>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Buscar canales...">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const total = 1050;
+    let currentActiveButton = null;
+
+    const channelNames = [
+      "TNT Sports 1 UK -1", "TNT Sports 1 UK -2", "TNT Sports 1 UK -3", "TNT Sports 1 UK -4", "TNT Sports 1 UK -5", "TNT Sports 1 UK -6", "TNT Sports 1 UK -7", "TNT Sports 1 UK -8", "TNT Sports 1 UK -9", "TNT Sports 1 UK -10", "TNT Sports 1 UK -11", "TNT Sports 1 UK -12", "TNT Sports 1 UK -13", "TNT Sports 1 UK -14", "TNT Sports 1 UK -15", "TNT Sports 1 UK -16", "TNT Sports 1 UK -17", "TNT Sports 1 UK -18", "TNT Sports 1 UK -19", "TNT Sports 1 UK -20", "TNT Sports 1 UK -21", "TNT Sports 1 UK -22", "TNT Sports 1 UK -23", "TNT Sports 1 UK -24", "TNT Sports 1 UK -25", "TNT Sports 1 UK -26",// Aquí van los nombres de los canales
+    ];
+
+    function createButtons(from, to) {
+      const wrap = document.getElementById('channelsList');
+      for (let i = from; i <= to; i++) {
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.textContent = channelNames[i - 1] || `Canal ${i}`;
+        b.dataset.channel = i;
+        b.onclick = () => load(i, b);
+        wrap.appendChild(b);
+      }
+    }
+
+    function load(n, button) {
+      const player = document.getElementById('player');
+      player.src = `https://thedaddy.to/embed/stream-${n}.php`;
+      
+      const nowPlaying = document.getElementById('now-playing');
+      nowPlaying.textContent = `Estas viendo: ${button.textContent}`;
+
+      if (currentActiveButton) {
+        currentActiveButton.classList.remove('active');
+      }
+
+      button.classList.add('active');
+      currentActiveButton = button;
+    }
+
+    function goFullscreen() {
+      const player = document.getElementById('player');
+      if (player.requestFullscreen) {
+        player.requestFullscreen();
+      } else if (player.mozRequestFullScreen) {
+        player.mozRequestFullScreen();
+      } else if (player.webkitRequestFullscreen) {
+        player.webkitRequestFullscreen();
+      } else if (player.msRequestFullscreen) {
+        player.msRequestFullscreen();
+      }
+    }
+
+    createButtons(1, total);
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const allButtons = document.querySelectorAll('.btn');
+
+      allButtons.forEach(button => {
+        const channelName = button.textContent.toLowerCase();
+        const channelNumber = button.dataset.channel;
+        
+        if (channelName.includes(searchTerm) || channelNumber.includes(searchTerm)) {
+          button.style.display = 'block';
+        } else {
+          button.style.display = 'none';
+        }
+      });
+    });
+
+    load(1, document.querySelector('.btn'));
+  </script>
+</body>
+</html>
